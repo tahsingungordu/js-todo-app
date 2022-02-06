@@ -41,13 +41,13 @@ function addTodo(e) {
 function removeTodo(e) {
     e.preventDefault();
 
-    if (! confirm('Are you sure you want to delete the item?')) {
-        return false;
-    }
-
-    todoList = sessionStorage.getItem('todoList');
-
     if (e.target.classList.contains('js-btn-delete')) {
+        todoList = sessionStorage.getItem('todoList');
+        
+        if (! confirm('Are you sure you want to delete the item?')) {
+            return false;
+        }
+
         arrayTodoList = JSON.parse(todoList);
 
         let removeDataId = e.target.parentElement.getAttribute('data-id');
@@ -88,7 +88,7 @@ if (todoList.length) {
 
     arrayTodoList.forEach((element, key) => {
         if (element != null) {
-            createTodoLi(arrayTodoList[key], key);
+            createTodoLi(element, key);
         }
     });
 }
