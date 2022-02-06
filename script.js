@@ -1,4 +1,4 @@
-var todoList = sessionStorage.getItem('todoList') ?? [];
+var todoList, arrayTodoList;
 
 function createTodoLi(text, id) {
     let taskList = document.querySelector('#task-list');
@@ -22,18 +22,10 @@ function addTodo(e) {
         return false;
     }
 
-    todoList = sessionStorage.getItem('todoList');
+    arrayTodoList = getTodoListStorage();
 
-    arrayTodoList = JSON.parse(todoList);
-    let arrayLenght = arrayTodoList == null ? 0 : arrayTodoList.length;
-
-    createTodoLi(txtTaskName.value, arrayLenght);
-    if (arrayTodoList == null) {
-        arrayTodoList = Array(arrayTodoList);
-    }
-    arrayTodoList.push(txtTaskName.value);
-
-    sessionStorage.setItem('todoList', JSON.stringify(arrayTodoList));
+    createTodoLi(txtTaskName.value, arrayTodoList.length);
+    setTodoStorage(txtTaskName.value);
 
     txtTaskName.value = '';
 }
@@ -42,18 +34,12 @@ function removeTodo(e) {
     e.preventDefault();
 
     if (e.target.classList.contains('js-btn-delete')) {
-        todoList = sessionStorage.getItem('todoList');
-        
         if (! confirm('Are you sure you want to delete the item?')) {
             return false;
         }
 
-        arrayTodoList = JSON.parse(todoList);
-
-        let removeDataId = e.target.parentElement.getAttribute('data-id');
-        let newTodoList = arrayRemove(arrayTodoList, removeDataId);
-
-        sessionStorage.setItem('todoList', JSON.stringify(newTodoList));
+        const removeDataId = e.target.parentElement.getAttribute('data-id');
+        removeTodoStorage(removeDataId);
 
         e.target.parentElement.remove();
     }
@@ -79,16 +65,35 @@ function arrayRemove(arr, key) {
     return filtered;
 }
 
+function getTodoListStorage() {
+    if (sessionStorage.getItem('todoList') === null) {
+        todoList = [];
+    } else {
+        todoList = JSON.parse(sessionStorage.getItem('todoList'));
+    }
+
+    return todoList;
+}
+
+function setTodoStorage(text) {
+    arrayTodoList = getTodoListStorage();
+    arrayTodoList.push(text);
+
+    sessionStorage.setItem('todoList', JSON.stringify(arrayTodoList));
+}
+
+function removeTodoStorage(key) {
+    arrayTodoList = getTodoListStorage();
+    const newTodoList = arrayRemove(arrayTodoList, key);
+
+    sessionStorage.setItem('todoList', JSON.stringify(newTodoList));
+}
+
 document.querySelector('#js-btn-add').addEventListener('click', addTodo);
 document.querySelector('ul').addEventListener('click', removeTodo);
 document.querySelector('#js-btn-delete-all').addEventListener('click', removeAllTodo);
 
-if (todoList.length) {
-    let arrayTodoList = JSON.parse(todoList);
-
-    arrayTodoList.forEach((element, key) => {
-        if (element != null) {
-            createTodoLi(element, key);
-        }
-    });
-}
+arrayTodoList = getTodoListStorage();
+arrayTodoList.forEach((element, key) => {
+    createTodoLi(element, key);
+});
