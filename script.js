@@ -34,6 +34,8 @@ function addTodo(e) {
     arrayTodoList.push(txtTaskName.value);
 
     sessionStorage.setItem('todoList', JSON.stringify(arrayTodoList));
+
+    txtTaskName.value = '';
 }
 
 function removeTodo(e) {
